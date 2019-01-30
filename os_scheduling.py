@@ -4,17 +4,24 @@ li = []
 print("Enter n lines, with each line containing Arrival time, and CPU burst time...\n")
 for i in range(n):
     li.append(list(map(int,input().split()))+[i])
+
+# Sort as per arrival time for FCFS
 li.sort()
+
 print("FCFS Ordering!!!")
 time = 0
 for i,index in enumerate(li):
     time=max(time,li[i][0])
     print("Index: ",li[i][2],", Burst Time: ",li[i][1],", Execution start time: ",time)
     time+=li[i][1]
+
+    
 print("\n\nSJF Ordering!!!")
-time = 0
+time = 0 #Keeps track of current time
 li1 = li[:]
 li2=[]
+#li1 contains all the jobs which are not yeat ready
+#li2 contains all jobs which are ready for execution
 while len(li1)!=0 or len(li2)!=0:
     removed = []
     for i in li1:
@@ -31,9 +38,14 @@ while len(li1)!=0 or len(li2)!=0:
         continue
     print("Index: ",job[2],", Burst Time: ",job[1],", Execution start time: ",time)
     time+=job[1]
+
+    
+    
+    
 li1=li[:]
 time = 0
 li2=[]
+#li1, li2 and time have their usual meaning as above.
 print("\n\nSRTF Scheduling!!!")
 while len(li1)!=0 or len(li2)!=0:
     removed = []
