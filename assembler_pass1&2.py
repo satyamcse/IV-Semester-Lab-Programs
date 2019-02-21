@@ -24,13 +24,13 @@ for line in file:
 			elif li[1]=='RESB':
 				offset_fix = int(li[2]) - 3
 			elif li[1]=='BYTE':
-				offset_fix = len(li[2]) - 3 - 3
+				offset_fix = (len(li[2]) - 3 + 1)//2 - 3 if li[2][0]=='X' else (len(li[2]) - 3) - 3
 		output_table.append([hex(startaddress+offset)]+li)if len(li)==3 else output_table.append([hex(startaddress+offset),"**"]+li)
 		offset+=3+offset_fix
 print("Symbol Table (HashMap)")
 for i in symbol_table.keys():
 	print(i, symbol_table[i])
-print("\nOutput Table")
+print("\niNTERMEDIATE TABLE")
 for j in output_table:
 	print(j)
 print ("Reading Optable...")
@@ -53,9 +53,14 @@ for li in output_table:
 		operation = li[2]
 		if operation not in op_table:
 			if operation=="WORD":
-				object_code = li[3]
+				object_code = '0'*(6-len(li[3]))+li[3]
 			elif operation=="BYTE":
-				object_code = li[3][2:len(li[3])-1]
+				if li[3]=='X':
+					object_code = li[3][2:len(li[3])-1]
+				else:
+					object_code = ""
+					for i in list(li[3][2:len(li[3])-1]):
+						object_code += str(hex(ord(i)))[2:]
 			elif operation=="RESB" or operation=="RESW":
 				object_code = " "
 			else:
@@ -72,4 +77,25 @@ for li in output_table:
 print("\nOutput Table")
 for j in output_table:
 	print(j)
-# TODO : Fix when Byte = c'F1' or x'F1'
+name = input("Program name?")
+if len(name)>6:
+	name= name[:6]
+if len (name)<6:
+	name = name+' '*(6-len(name))
+s1 = 'H^'+name+'^00'+output_table[1][0][2:]+'^0000'+hex(offset-3)[2:]
+
+s2 = 'T^00'+output_table[1][0][2:]+'^1E'
+for i in output_table:
+	try:
+		if len(i)>4 and len(i[4])==6:
+			s2+='^'+i[4]
+	except:
+		a=5
+
+s3 = 'E^'+'00'+output_table[1][0][2:]
+print(s1)
+print(s2)
+print(s3)
+file = open("Output.txt",'w')
+file.write(s1+'\n'+s2+'\n'+s3)
+file.close()
