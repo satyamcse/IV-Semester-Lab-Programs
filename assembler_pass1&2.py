@@ -53,9 +53,10 @@ for li in output_table:
 		operation = li[2]
 		if operation not in op_table:
 			if operation=="WORD":
+				li[3] = hex(int(li[3]))[2:]
 				object_code = '0'*(6-len(li[3]))+li[3]
 			elif operation=="BYTE":
-				if li[3]=='X':
+				if "X'" in li[3]:
 					object_code = li[3][2:len(li[3])-1]
 				else:
 					object_code = ""
@@ -69,9 +70,14 @@ for li in output_table:
 			object_code = op_table[operation]
 			print(object_code)
 			if len(li)>3:
+				if ',X' in li[3]:
+					li[3] = li[3][:len(li[3])-2]
+					k = symbol_table[li[3]][2:]
+					k = hex(int(k,16)+2**15)[2:]
+				else: k = symbol_table[li[3]][2:]
 				if li[3] not in symbol_table:
 					print ("INVALID OPERAND ",li[3],": Pass 2 failed!")
-				object_code= object_code + symbol_table[li[3]][2:]
+				object_code= object_code + k
 			else: object_code+='0000'
 		li.append(object_code)
 print("\nOutput Table")
